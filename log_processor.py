@@ -15,7 +15,7 @@ collection = db[collection_name] # creates collection if not exists
 
 try:
     client.admin.command('ping')
-    print("Connected to MongDB Atlas successfully!")
+    print("Connected to MongoDB Atlas successfully!")
 except Exception as e:
     print(f"Connection failed: {e}")
 
@@ -31,3 +31,14 @@ def count_by_priority(collection):
    # [{"$group":{"_id" : "$priority", "count": {"$sum": 1}, "avg_reopens": {"$avg": "$reopen_count"}, "max_reassignments": {"$max": "$reassignment_count"}}}]
 
 count_by_priority(collection)
+
+def count_by_state(collection):
+    pipeline = [
+        {"$group": {"_id": "$incident_state", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    results = collection.aggregate(pipeline)
+    for result in results:
+        print(f"State: {result['_id']} | Count: {result['count']}")
+
+count_by_state(collection)
